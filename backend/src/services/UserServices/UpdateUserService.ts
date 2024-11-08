@@ -1,64 +1,44 @@
-import * as Yup from "yup";
-
-import AppError from "../../errors/AppError";
-import { SerializeUser } from "../../helpers/SerializeUser";
-import ShowUserService from "./ShowUserService";
+/* eslint-disable prettier/prettier */
+import User from "../models/User";
+import AppError from "../errors/AppError";
+import CheckSettingsHelper from "../helpers/CheckSettings";
 
 interface UserData {
-  email?: string;
-  password?: string;
-  name?: string;
-  profile?: string;
-  queueIds?: number[];
-  whatsappId?: number;
-}
-
-interface Request {
-  userData: UserData;
-  userId: string | number;
-}
-
-interface Response {
-  id: number;
-  name: string;
   email: string;
+  password: string;
+  name: string;
   profile: string;
+  queueIds: number[];
+  whatsappId: number;
 }
 
-const UpdateUserService = async ({
-  userData,
-  userId
-}: Request): Promise<Response | undefined> => {
-  const user = await ShowUserService(userId);
+// Criar usuário
+export const createUser = async (userData: UserData): Promise<User> => {
+  const { email, password, name, profile, queueIds, whatsappId } = userData;
 
-  const schema = Yup.object().shape({
-    name: Yup.string().min(2),
-    email: Yup.string().email(),
-    profile: Yup.string(),
-    password: Yup.string()
-  });
-
-  const { email, password, profile, name, queueIds = [], whatsappId } = userData;
-
-  try {
-    await schema.validate({ email, password, profile, name });
-  } catch (err) {
-    throw new AppError(err.message);
+  if (await CheckSettingsHelper("userCreation") === "disabled") {
+    throw new AppError("ERR_USER_CREATION_DISABLED", 403);
   }
 
-  await user.update({
+  return await User.create({
     email,
     password,
-    profile,
     name,
-    whatsappId: whatsappId ? whatsappId : null
+    profile,
+    queueIds,
+    whatsappId
   });
-
-  await user.$set("queues", queueIds);
-
-  await user.reload();
-
-  return SerializeUser(user);
 };
 
-export default UpdateUserService;
+// Remover usuário
+export const deleteUser = async (userId: string): Promise<void> => {
+  const user = await User.findByPk(userId);
+  if (!user) {
+    throw new AppError("Usuário não encontrado", 404);
+  }
+  await user.destroy();
+};
+
+// Listar usuários
+  // Aqui você aplicaria lógica para listar usuários, considerando paginação e filtros.
+};

@@ -1,18 +1,32 @@
+/* eslint-disable prettier/prettier */
 import { Router } from "express";
-
+import multer from "multer";
 import isAuth from "../middleware/isAuth";
 import * as UserController from "../controllers/UserController";
 
 const userRoutes = Router();
+const upload = multer();
 
-userRoutes.get("/users", isAuth, UserController.index);
+// Rotas de imagem de perfil
+userRoutes.post(
+  "/users/:userId/profile-image",
+  isAuth,
+  upload.single("profileImage"),
+  UserController.updateProfileImage
+);
 
-userRoutes.post("/users", isAuth, UserController.store);
+userRoutes.delete(
+  "/users/:userId/profile-image",
+  isAuth,
+  UserController.deleteProfileImage
+);
 
-userRoutes.put("/users/:userId", isAuth, UserController.update);
-
-userRoutes.get("/users/:userId", isAuth, UserController.show);
-
-userRoutes.delete("/users/:userId", isAuth, UserController.remove);
+// Rota para atualizar informações do usuário, incluindo a imagem de perfil
+userRoutes.put(
+  "/users/:id", 
+  isAuth,
+  upload.single("profile"),  
+  UserController.updateProfile
+);
 
 export default userRoutes;

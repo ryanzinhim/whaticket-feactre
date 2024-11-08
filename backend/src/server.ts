@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import gracefulShutdown from "http-graceful-shutdown";
 import app from "./app";
 import { initIO } from "./libs/socket";

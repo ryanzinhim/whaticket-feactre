@@ -1,4 +1,5 @@
-import {
+/* eslint-disable prettier/prettier */
+import { 
   Table,
   Column,
   CreatedAt,
@@ -10,10 +11,10 @@ import {
   PrimaryKey,
   AutoIncrement,
   Default,
-  HasMany,
-  BelongsToMany,
   ForeignKey,
-  BelongsTo
+  BelongsTo,
+  HasMany,
+  BelongsToMany 
 } from "sequelize-typescript";
 import { hash, compare } from "bcryptjs";
 import Ticket from "./Ticket";
@@ -22,7 +23,7 @@ import UserQueue from "./UserQueue";
 import Whatsapp from "./Whatsapp";
 
 @Table
-class User extends Model<User> {
+export default class User extends Model<User> {
   @PrimaryKey
   @AutoIncrement
   @Column
@@ -78,6 +79,6 @@ class User extends Model<User> {
   public checkPassword = async (password: string): Promise<boolean> => {
     return compare(password, this.getDataValue("passwordHash"));
   };
-}
 
-export default User;
+  profileImage: unknown;
+}
